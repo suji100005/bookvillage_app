@@ -61,6 +61,8 @@ export type Database = {
           is_guest: boolean
           contact_phone: string | null
           memo: string | null
+          book_level: string | null
+          book_count: number | null
           notifications_read_at: string | null
           notices_read_at: string | null
           created_at: string
@@ -76,6 +78,8 @@ export type Database = {
           is_guest?: boolean
           contact_phone?: string | null
           memo?: string | null
+          book_level?: string | null
+          book_count?: number | null
           notifications_read_at?: string | null
           notices_read_at?: string | null
           created_at?: string
@@ -91,6 +95,8 @@ export type Database = {
           is_guest?: boolean
           contact_phone?: string | null
           memo?: string | null
+          book_level?: string | null
+          book_count?: number | null
           notifications_read_at?: string | null
           notices_read_at?: string | null
           created_at?: string

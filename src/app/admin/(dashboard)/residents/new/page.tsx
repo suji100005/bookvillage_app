@@ -15,6 +15,8 @@ export default function NewCardMemberPage() {
   const [groups, setGroups] = useState<string[]>([]);
   const [group, setGroup] = useState("");
   const [name, setName] = useState("");
+  const [bookLevel, setBookLevel] = useState("");
+  const [bookCount, setBookCount] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [memo, setMemo] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +41,14 @@ export default function NewCardMemberPage() {
       return;
     }
     startTransition(async () => {
-      const result = await createCardMember({ name, group, contact_phone: contactPhone, memo });
+      const result = await createCardMember({
+        name,
+        group,
+        book_level: bookLevel,
+        book_count: bookCount,
+        contact_phone: contactPhone,
+        memo,
+      });
       if (!result.success) {
         setError(result.error ?? "회원 생성에 실패했습니다.");
         return;
@@ -104,6 +113,34 @@ export default function NewCardMemberPage() {
               autoFocus
               onChange={(e) => setName(e.target.value)}
             />
+          </div>
+
+          <div className="grid grid-cols-[2fr_1fr] gap-3">
+            <div className="space-y-2">
+              <label className="font-semibold">
+                도서레벨 <span className="text-sm font-normal text-muted-foreground">(선택 · 카드에 표시)</span>
+              </label>
+              <Input
+                className="h-14 text-lg"
+                placeholder="예: 1.1-1.5"
+                value={bookLevel}
+                maxLength={40}
+                onChange={(e) => setBookLevel(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="font-semibold">
+                권수 <span className="text-sm font-normal text-muted-foreground">(선택)</span>
+              </label>
+              <Input
+                className="h-14 text-lg"
+                placeholder="3"
+                inputMode="numeric"
+                value={bookCount}
+                maxLength={2}
+                onChange={(e) => setBookCount(e.target.value)}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

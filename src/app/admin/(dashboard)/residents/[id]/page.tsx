@@ -95,14 +95,21 @@ export default function AdminResidentDetailPage() {
 
   // 카드 회원 정보 수정 state
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ name: "", group: "", contact_phone: "", memo: "" });
+  const [form, setForm] = useState({ name: "", group: "", book_level: "", book_count: "", contact_phone: "", memo: "" });
   const [editMsg, setEditMsg] = useState<string | null>(null);
   const [isSaving, startSaving] = useTransition();
 
   function startEdit() {
     if (!data) return;
     const p = data.profile;
-    setForm({ name: p.name, group: p.dong_ho, contact_phone: p.contact_phone ?? "", memo: p.memo ?? "" });
+    setForm({
+      name: p.name,
+      group: p.dong_ho,
+      book_level: p.book_level ?? "",
+      book_count: p.book_count ? String(p.book_count) : "",
+      contact_phone: p.contact_phone ?? "",
+      memo: p.memo ?? "",
+    });
     setEditMsg(null);
     setEditing(true);
   }
@@ -251,6 +258,8 @@ export default function AdminResidentDetailPage() {
               {([
                 ["name", "이름", 20],
                 ["group", "반(소속)", 20],
+                ["book_level", "도서레벨 (카드에 표시, 예: 1.1-1.5)", 40],
+                ["book_count", "대여 권수 (카드에 표시)", 2],
                 ["contact_phone", "보호자 휴대폰 (선택)", 20],
               ] as const).map(([key, label, max]) => (
                 <div key={key} className="space-y-1.5">
@@ -259,7 +268,7 @@ export default function AdminResidentDetailPage() {
                     className="h-12 text-lg"
                     value={form[key]}
                     maxLength={max}
-                    inputMode={key === "contact_phone" ? "tel" : undefined}
+                    inputMode={key === "contact_phone" ? "tel" : key === "book_count" ? "numeric" : undefined}
                     onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
                   />
                 </div>
@@ -316,6 +325,16 @@ export default function AdminResidentDetailPage() {
               </div>
               {isCardMember && (
                 <>
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="size-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">도서레벨 · 권수</p>
+                      <p className="font-semibold">
+                        {profile.book_level || "-"}
+                        {profile.book_count ? ` · ${profile.book_count}권` : ""}
+                      </p>
+                    </div>
+                  </div>
                   <div className="flex items-center gap-2">
                     <Phone className="size-4 text-muted-foreground" />
                     <div>

@@ -136,6 +136,12 @@ function MemberCardPrint() {
                   <div>
                     <p className="member-card-name text-2xl font-bold leading-tight break-keep">{m.name}</p>
                     <p className="member-card-group text-sm text-neutral-600">{m.dong_ho}</p>
+                    {(m.book_level || m.book_count) && (
+                      <p className="member-card-level mt-1 inline-flex flex-wrap items-baseline gap-x-1.5 rounded border border-neutral-300 px-1.5 py-0.5 text-xs leading-snug break-keep">
+                        {m.book_level && <span>📚 {m.book_level}</span>}
+                        {m.book_count && <b>{m.book_count}권</b>}
+                      </p>
+                    )}
                   </div>
                   <p className="text-[10px] text-neutral-500">도서관 회원카드</p>
                 </div>

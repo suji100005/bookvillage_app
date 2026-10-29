@@ -33,7 +33,24 @@ async function createAuthUserWithNewCode(): Promise<{ id: string; code: string }
   return { error: '회원카드 코드 생성에 실패했습니다.' }
 }
 
-export type CardMemberInput = { name: string; group: string; contact_phone?: string; memo?: string }
+export type CardMemberInput = {
+  name: string
+  group: string
+  contact_phone?: string
+  memo?: string
+  book_level?: string
+  book_count?: string | number
+}
+
+// 도서레벨(자유 입력, 40자)·권수(1~20, 비우면 null) 정리
+function parseReading(level: string | undefined, count: string | number | undefined) {
+  const book_level = (level ?? '').trim() || null
+  const raw = String(count ?? '').replace(/[^\d]/g, '')
+  const book_count = raw ? Number(raw) : null
+  if (book_level && book_level.length > 40) return { error: '도서레벨은 40자 이내여야 합니다.' }
+  if (book_count !== null && (book_count < 1 || book_count > 20)) return { error: '권수는 1~20 사이여야 합니다.' }
+  return { values: { book_level, book_count } }
+}
 
 // 입력 정리·검증: 이름/반 필수, 연락처(숫자만)·메모는 선택
 function parseMemberInput(input: CardMemberInput) {
@@ -45,7 +62,9 @@ function parseMemberInput(input: CardMemberInput) {
   if (!group || group.length > 20) return { error: '반은 1~20자로 입력해주세요.' }
   if (contact_phone && contact_phone.length > 20) return { error: '휴대폰 번호가 너무 깁니다.' }
   if (memo && memo.length > 500) return { error: '메모는 500자 이내여야 합니다.' }
-  return { values: { name, dong_ho: group, contact_phone, memo } }
+  const reading = parseReading(input.book_level, input.book_count)
+  if ('error' in reading) return { error: reading.error }
+  return { values: { name, dong_ho: group, contact_phone, memo, ...reading.values } }
 }
 
 // 관리자: 카드 회원 생성 (QR 코드 자동 발급)
@@ -75,13 +94,35 @@ export async function getCardMembers() {
 
   const { data } = await supabaseAdmin
     .from('profiles')
-    .select('id, name, dong_ho, phone_number, created_at')
+    .select('id, name, dong_ho, phone_number, book_level, book_count, created_at')
     .eq('role', 'resident')
     .like('phone_number', `${MEMBER_CARD_PREFIX}%`)
     .order('dong_ho', { ascending: true })
     .order('name', { ascending: true })
 
   return (data ?? []).filter((p) => isMemberCardCode(p.phone_number))
+}
+
+// 관리자: 도서레벨·권수만 수정 (일괄 등록에서 기존 회원 갱신용 — 연락처·메모는 건드리지 않음)
+export async function setCardMemberReading(
+  userId: string,
+  level: string | undefined,
+  count: string | number | undefined
+): Promise<ActionResult> {
+  if (!(await requireApprovedAdmin())) return { success: false, error: '권한이 없습니다.' }
+
+  const reading = parseReading(level, count)
+  if ('error' in reading) return { success: false, error: reading.error }
+
+  const { error } = await supabaseAdmin
+    .from('profiles')
+    .update(reading.values)
+    .eq('id', userId)
+    .eq('role', 'resident')
+    .like('phone_number', `${MEMBER_CARD_PREFIX}%`)
+
+  if (error) return { success: false, error: '저장에 실패했습니다.' }
+  return { success: true }
 }
 
 // 관리자: 카드 회원 정보 수정 (이름/반/연락처/메모)

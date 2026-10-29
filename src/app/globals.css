@@ -329,6 +329,9 @@
   .member-card-group {
     font-size: 11pt !important;
   }
+  .member-card-level {
+    font-size: 9pt !important;
+  }
 
   /* 로고 인쇄: 스티커 가득 채우기 */
   .logo-print .barcode-label img {

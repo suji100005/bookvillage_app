@@ -1228,7 +1228,7 @@ export async function getResidentDetail(userId: string) {
   const [profileRes, activeRes, pastRes] = await Promise.all([
     supabaseAdmin
       .from('profiles')
-      .select('id, name, dong_ho, phone_number, contact_phone, memo, created_at')
+      .select('id, name, dong_ho, phone_number, contact_phone, memo, book_level, book_count, created_at')
       .eq('id', userId)
       .single(),
     supabaseAdmin
