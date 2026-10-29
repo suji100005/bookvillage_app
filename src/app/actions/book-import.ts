@@ -2,8 +2,10 @@
 
 // 도서 일괄 등록: 엑셀에서 붙여넣은 [바코드, 제목, 저자, AR지수, AR포인트, 퀴즈번호, IL] 행을 한 번에 등록.
 // 이미 있는 바코드는 새로 만들지 않고 AR 정보만 갱신(빈 값은 덮어쓰지 않음). 삭제된 도서는 복원.
+// 새 도서는 AR지수 구간 책장(lib/ar-shelf)에 자동 배치.
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getCurrentUser } from '@/app/actions/auth'
+import { arShelfName, AR_SHELVES, NO_AR_SHELF } from '@/lib/ar-shelf'
 
 export type ImportBookRow = {
   barcode: string
@@ -46,6 +48,22 @@ function normalize(r: ImportBookRow) {
   }
 }
 
+// 서가 지도에 AR 구간 책장이 없으면 만들어 둠 (첫 줄에 2칸 폭으로 차례대로)
+const SHELF_COLORS = ['#94a3b8', '#60a5fa', '#38bdf8', '#34d399', '#a3e635', '#facc15', '#fb923c', '#f87171', '#c084fc', '#2d5a2d']
+async function ensureShelves(names: Set<string>) {
+  const order = [...AR_SHELVES.map((s) => s.name), NO_AR_SHELF]
+  const { data } = await supabaseAdmin.from('shelves').select('name')
+  const have = new Set((data ?? []).map((s) => s.name))
+  const missing = order.filter((n) => names.has(n) && !have.has(n))
+  if (missing.length === 0) return
+  await supabaseAdmin.from('shelves').insert(
+    missing.map((name) => {
+      const idx = order.indexOf(name)
+      return { name, position_x: idx * 2, position_y: 0, width: 2, height: 2, color: SHELF_COLORS[idx], type: 'shelf' }
+    })
+  )
+}
+
 // 한 번에 최대 200행 (클라이언트에서 나눠서 호출)
 export async function importBooks(rows: ImportBookRow[]): Promise<ImportResult & { fatal?: string }> {
   const result: ImportResult = { inserted: 0, updated: 0, restored: 0, errors: [] }
@@ -63,10 +81,14 @@ export async function importBooks(rows: ImportBookRow[]): Promise<ImportResult &
 
   const { data: existing, error: selErr } = await supabaseAdmin
     .from('books')
-    .select('id, barcode, is_deleted')
+    .select('id, barcode, is_deleted, location_group, ar_level')
     .in('barcode', items.map((i) => i.barcode))
   if (selErr) return { ...result, fatal: `조회 실패: ${selErr.message}` }
   const byBarcode = new Map((existing ?? []).map((b) => [b.barcode, b]))
+
+  await ensureShelves(
+    new Set([...items.map((i) => arShelfName(i.ar.ar_level)), ...(existing ?? []).map((b) => arShelfName(b.ar_level))])
+  )
 
   // 새 도서: 한 번에 insert
   const fresh = items.filter((i) => !byBarcode.has(i.barcode))
@@ -76,7 +98,7 @@ export async function importBooks(rows: ImportBookRow[]): Promise<ImportResult &
         barcode: i.barcode,
         ...i.base,
         ...i.ar,
-        location_group: '',
+        location_group: arShelfName(i.ar.ar_level),
         location_detail: '',
         created_by: user.id,
       }))
@@ -88,7 +110,7 @@ export async function importBooks(rows: ImportBookRow[]): Promise<ImportResult &
           barcode: i.barcode,
           ...i.base,
           ...i.ar,
-          location_group: '',
+          location_group: arShelfName(i.ar.ar_level),
           location_detail: '',
           created_by: user.id,
         })
@@ -108,6 +130,8 @@ export async function importBooks(rows: ImportBookRow[]): Promise<ImportResult &
       Object.entries(i.ar).filter(([, v]) => v !== null)
     )
     if (ex.is_deleted) Object.assign(patch, i.base, { is_deleted: false, is_available: true })
+    // 서가가 비어 있던 책은 AR 구간 책장으로 배치
+    if (!ex.location_group) patch.location_group = arShelfName(i.ar.ar_level ?? ex.ar_level)
     if (Object.keys(patch).length === 0) continue
     const { error } = await supabaseAdmin.from('books').update(patch).eq('id', ex.id)
     if (error) result.errors.push({ barcode: i.barcode, error: error.message })

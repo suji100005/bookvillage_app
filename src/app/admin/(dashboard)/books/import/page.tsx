@@ -95,8 +95,8 @@ export default function BookImportPage() {
               열을 그대로 복사해 붙여넣으세요. 바코드·제목 외에는 비워도 됩니다.
             </p>
             <p>
-              이미 등록된 바코드는 새로 만들지 않고 <b className="text-foreground">AR 정보만 갱신</b>해요. 서가 위치는 등록 후
-              &lsquo;책장 이동&rsquo;이나 목록에서 일괄 지정하세요.
+              새 책은 AR지수 구간 책장(AR 0점대 · 1.1-1.5 · 1.6-1.9 · 2.0-2.4 …)에 자동으로 배치되고, AR지수가 없으면
+              &lsquo;리더스&rsquo; 칸에 들어가요. 이미 등록된 바코드는 새로 만들지 않고 <b className="text-foreground">AR 정보만 갱신</b>해요.
             </p>
           </div>
 
