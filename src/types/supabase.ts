@@ -244,6 +244,10 @@ export type Database = {
           age_group: string | null
           sub_category: string | null
           series_name: string | null
+          ar_level: number | null
+          ar_points: number | null
+          ar_quiz_no: string | null
+          interest_level: string | null
           textbook_grades: number[]
           classification_source: string | null
           classified_at: string | null
@@ -275,6 +279,10 @@ export type Database = {
           age_group?: string | null
           sub_category?: string | null
           series_name?: string | null
+          ar_level?: number | null
+          ar_points?: number | null
+          ar_quiz_no?: string | null
+          interest_level?: string | null
           textbook_grades?: number[]
           classification_source?: string | null
           classified_at?: string | null
@@ -306,6 +314,10 @@ export type Database = {
           age_group?: string | null
           sub_category?: string | null
           series_name?: string | null
+          ar_level?: number | null
+          ar_points?: number | null
+          ar_quiz_no?: string | null
+          interest_level?: string | null
           textbook_grades?: number[]
           classification_source?: string | null
           classified_at?: string | null

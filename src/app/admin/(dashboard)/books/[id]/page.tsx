@@ -246,6 +246,17 @@ export default function AdminBookDetailPage() {
                 <p className="font-mono">{book.isbn}</p>
               </div>
             )}
+            {(book.ar_level !== null || book.ar_quiz_no) && (
+              <div>
+                <p className="text-muted-foreground">AR</p>
+                <p className="font-semibold">
+                  {book.ar_level !== null ? `BL ${book.ar_level}` : "-"}
+                  {book.ar_points !== null ? ` · ${book.ar_points}pt` : ""}
+                  {book.interest_level ? ` · ${book.interest_level}` : ""}
+                </p>
+                {book.ar_quiz_no && <p className="text-xs text-muted-foreground font-mono">Quiz #{book.ar_quiz_no}</p>}
+              </div>
+            )}
             <div>
               <p className="text-muted-foreground flex items-center gap-1">
                 <MapPin className="size-3" />

@@ -27,7 +27,7 @@ export async function getBooks(params: BookListParams = {}) {
       const esc = (s: string) => s.replace(/[%_,]/g, "")
       for (const term of terms) {
         const loose = esc(term).split("").join("%")
-        x = x.or(`title.ilike.%${loose}%,author.ilike.%${term}%`)
+        x = x.or(`title.ilike.%${loose}%,author.ilike.%${term}%,barcode.ilike.%${esc(term)}%`)
       }
     }
     if (available !== undefined) x = x.eq('is_available', available)

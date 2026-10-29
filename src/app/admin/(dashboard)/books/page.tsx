@@ -46,6 +46,7 @@ type BookItem = {
   location_group: string;
   location_detail: string;
   is_available: boolean;
+  ar_level: number | null;
 };
 
 type ShelfOption = { id: string; name: string; type: string };
@@ -159,7 +160,12 @@ export default function AdminBooksPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">전체 도서 목록</h1>
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-2xl font-bold">전체 도서 목록</h1>
+        <Button size="sm" variant="outline" onClick={() => router.push("/admin/books/import")}>
+          엑셀로 일괄 등록
+        </Button>
+      </div>
 
       {/* 선택 액션 바 */}
       {selectedCount > 0 && (
@@ -231,6 +237,7 @@ export default function AdminBooksPage() {
                       <TableHead>바코드</TableHead>
                       <TableHead>제목</TableHead>
                       <TableHead>저자</TableHead>
+                      <TableHead className="w-16">AR</TableHead>
                       <TableHead>서가 위치</TableHead>
                       <TableHead className="text-right">상태</TableHead>
                     </TableRow>
@@ -270,6 +277,7 @@ export default function AdminBooksPage() {
                         <TableCell className="font-mono text-xs">{b.barcode}</TableCell>
                         <TableCell className="font-medium">{b.title}</TableCell>
                         <TableCell className="text-muted-foreground">{b.author}</TableCell>
+                        <TableCell className="font-mono text-sm">{b.ar_level ?? "-"}</TableCell>
                         <TableCell className="text-muted-foreground">
                           {b.location_group}{b.location_detail ? ` > ${b.location_detail}` : ""}
                         </TableCell>
