@@ -203,6 +203,49 @@ export async function signInByCard(rawCode: string): Promise<ActionResult<{ name
   return { success: true, data: { name: profile?.name ?? '' } }
 }
 
+// 키오스크(리더기 모드)가 켜져 있을 때만 이름 로그인 허용
+async function kioskEnabled() {
+  const { data } = await supabaseAdmin.from('library_settings').select('value').eq('key', 'kiosk_mode').maybeSingle()
+  return data?.value === 'on'
+}
+
+// 키오스크: 이름으로 카드 회원 찾기 — 이름 전체가 정확히 같을 때만(띄어쓰기 무시), 반만 함께 돌려줌
+export async function findKioskMembersByName(
+  rawName: string
+): Promise<ActionResult<{ id: string; name: string; group: string }[]>> {
+  if (!(await kioskEnabled())) return { success: false, error: '이름 로그인을 사용할 수 없습니다.' }
+  const name = rawName.replace(/\s+/g, '')
+  if (name.length < 2 || name.length > 20) return { success: false, error: '이름을 정확히 입력해주세요.' }
+
+  const { data } = await supabaseAdmin
+    .from('profiles')
+    .select('id, name, dong_ho, phone_number')
+    .eq('role', 'resident')
+    .like('phone_number', `${MEMBER_CARD_PREFIX}%`)
+    .ilike('name', `%${name.split('').join('%')}%`)
+    .limit(30)
+
+  const list = (data ?? [])
+    .filter((p) => isMemberCardCode(p.phone_number) && p.name.replace(/\s+/g, '') === name)
+    .map((p) => ({ id: p.id, name: p.name, group: p.dong_ho }))
+  if (list.length === 0) return { success: false, error: '등록된 이름이 없어요. 선생님께 말씀해주세요.' }
+  return { success: true, data: list }
+}
+
+// 키오스크: 이름 검색 결과에서 고른 회원으로 로그인 (서버에서 카드 코드로 로그인)
+export async function signInByMemberId(userId: string): Promise<ActionResult<{ name: string }>> {
+  if (!(await kioskEnabled())) return { success: false, error: '이름 로그인을 사용할 수 없습니다.' }
+  const { data: p } = await supabaseAdmin
+    .from('profiles')
+    .select('name, role, phone_number')
+    .eq('id', userId)
+    .maybeSingle()
+  if (!p || p.role !== 'resident' || !isMemberCardCode(p.phone_number)) {
+    return { success: false, error: '회원을 찾을 수 없습니다.' }
+  }
+  return signInByCard(p.phone_number)
+}
+
 // 키오스크: 리다이렉트 없이 로그아웃 (다음 사람 대기 화면 유지)
 export async function kioskSignOut(): Promise<void> {
   const supabase = await createClient()

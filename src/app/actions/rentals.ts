@@ -1148,7 +1148,7 @@ export async function selfCheckout(barcode: string): Promise<ActionResult<{ book
 // returned: 반납함 / not_rented: 대출 중이 아닌 책 (로그인한 회원이면 대출로 이어감)
 export async function kioskReturn(
   barcode: string
-): Promise<ActionResult<{ status: 'returned' | 'not_rented'; book_title: string }>> {
+): Promise<ActionResult<{ status: 'returned' | 'not_rented'; book_title: string; borrower_name?: string; overdue?: boolean }>> {
   const { data: settings } = await supabaseAdmin
     .from('library_settings')
     .select('key, value')
@@ -1168,12 +1168,14 @@ export async function kioskReturn(
 
   const { data: rental } = await supabaseAdmin
     .from('rentals')
-    .select('id, user_id')
+    .select('id, user_id, due_date, profile:profiles!rentals_user_id_fkey(name)')
     .eq('book_id', book.id)
     .is('returned_at', null)
     .limit(1)
     .maybeSingle()
   if (!rental) return { success: true, data: { status: 'not_rented', book_title: book.title } }
+  const borrower_name = (rental.profile as { name: string } | null)?.name
+  const overdue = rental.due_date < getKSTDateString()
 
   const user = await getCurrentUser()
   const { error } = await supabaseAdmin
@@ -1184,7 +1186,24 @@ export async function kioskReturn(
 
   awardJellyForReturn(rental.user_id, book.title, book.id).catch(() => {})
 
-  return { success: true, data: { status: 'returned', book_title: book.title } }
+  return { success: true, data: { status: 'returned', book_title: book.title, borrower_name, overdue } }
+}
+
+// 키오스크: 로그인한 회원이 아직 반납하지 않은 책 전체 (연체 포함)
+export async function getMyActiveRentals(): Promise<{ barcode: string; title: string; due_date: string }[]> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+  const { data } = await supabase
+    .from('rentals')
+    .select('due_date, book:books(barcode, title)')
+    .eq('user_id', user.id)
+    .is('returned_at', null)
+    .order('due_date', { ascending: true })
+  return (data ?? []).map((r) => {
+    const b = r.book as unknown as { barcode: string; title: string } | null
+    return { barcode: b?.barcode ?? '', title: b?.title ?? '', due_date: r.due_date }
+  })
 }
 
 export async function getAllResidents() {
