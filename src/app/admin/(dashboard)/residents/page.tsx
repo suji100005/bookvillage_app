@@ -77,6 +77,10 @@ export default function AdminResidentsPage() {
                 <QrCode className="size-4 mr-1" />
                 카드 인쇄
               </Button>
+              <Button size="sm" variant="outline" onClick={() => router.push("/admin/residents/bulk")}>
+                <Users className="size-4 mr-1" />
+                일괄 등록
+              </Button>
               <Button size="sm" onClick={() => router.push("/admin/residents/new")}>
                 <UserPlus className="size-4 mr-1" />
                 회원 추가
