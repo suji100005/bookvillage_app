@@ -300,16 +300,16 @@
     max-width: 100% !important;
   }
   /* 회원카드 인쇄: 85×50mm, A4 한 장에 2열×5행 = 10장 */
-  /* A4 인쇄 영역 200×277mm 안에 85×50mm 카드 2열×5행. 한 묶음 = 한 장 */
+  /* A4 인쇄 영역 200×277mm 안에 47×29mm 카드 4열×9행(=36장). 한 묶음 = 한 장 */
   .member-card-grid {
     display: grid !important;
-    grid-template-columns: repeat(2, 85mm) !important;
-    grid-auto-rows: 50mm !important;
-    gap: 3mm !important;
+    grid-template-columns: repeat(4, 47mm) !important;
+    grid-auto-rows: 29mm !important;
+    gap: 1.5mm 2mm !important;
     justify-content: center !important;
     align-content: start !important;
     width: 200mm !important;
-    height: 270mm !important;
+    height: 274mm !important;
     margin: 0 !important;
     overflow: hidden;
     break-after: page;
@@ -320,31 +320,34 @@
     page-break-after: auto;
   }
   .member-card {
-    width: 85mm !important;
-    height: 50mm !important;
-    padding: 3mm !important;
-    gap: 2mm !important;
-    border: 0.3mm solid #999 !important;
-    border-radius: 2mm !important;
+    width: 47mm !important;
+    height: 29mm !important;
+    padding: 1.6mm 1.8mm !important;
+    gap: 0.8mm !important;
+    border: 0.25mm solid #999 !important;
+    border-radius: 1.5mm !important;
     break-inside: avoid;
     page-break-inside: avoid;
     overflow: hidden;
   }
   .member-card-qr {
-    width: 38mm !important;
-    height: 38mm !important;
+    width: 19.5mm !important;
+    height: 19.5mm !important;
   }
   .member-card-logo {
-    height: 6mm !important;
+    height: 3.2mm !important;
+  }
+  .member-card-lib {
+    font-size: 5.5pt !important;
   }
   .member-card-name {
-    font-size: 20pt !important;
+    font-size: 12pt !important;
   }
   .member-card-group {
-    font-size: 11pt !important;
+    font-size: 6.5pt !important;
   }
   .member-card-level {
-    font-size: 9pt !important;
+    font-size: 6.5pt !important;
   }
 
   /* 로고 인쇄: 스티커 가득 채우기 */

@@ -361,7 +361,7 @@ export default function RentPage() {
             <img
               src={publicSettings.logo_url}
               alt="로고"
-              className="size-[clamp(2rem,5vw,3rem)] rounded-lg object-contain shrink-0"
+              className="h-[clamp(2rem,5vw,3rem)] w-auto max-w-[9rem] object-contain shrink-0"
             />
           ) : (
             <div className="size-[clamp(2rem,5vw,3rem)] rounded-lg bg-primary/10 flex items-center justify-center shrink-0">

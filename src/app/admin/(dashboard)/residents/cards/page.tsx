@@ -12,7 +12,7 @@ import { getPublicSettings } from "@/app/actions/settings";
 
 type Member = Awaited<ReturnType<typeof getCardMembers>>[number];
 
-const CARDS_PER_PAGE = 10;
+const CARDS_PER_PAGE = 36;
 
 function MemberCardPrint() {
   const router = useRouter();
@@ -122,36 +122,35 @@ function MemberCardPrint() {
                 ))}
               </div>
               <p className="text-sm text-muted-foreground">
-                A4 한 장에 10장(85×50mm)씩 인쇄됩니다. 인쇄 창에서 배율은 100%(실제 크기), 용지당 페이지는 1로 두세요. 테두리선을 따라 잘라 코팅하면 오래 쓸 수 있어요.
+                A4 한 장에 36장(47×29mm, 한 줄에 4개)씩 인쇄됩니다. 인쇄 창에서 배율은 100%(실제 크기), 용지당 페이지는 1로 두세요. 테두리선을 따라 잘라 코팅하면 오래 쓸 수 있어요.
               </p>
             </CardContent>
           </Card>
 
-          {/* A4 한 장(2열×5행=10장)씩 묶어서 인쇄 — 장마다 강제로 페이지를 나눠 카드가 잘리지 않게 */}
+          {/* A4 한 장(4열×9행=36장)씩 묶어서 인쇄 — 장마다 강제로 페이지를 나눠 카드가 잘리지 않게 */}
           {Array.from({ length: Math.ceil(toPrint.length / CARDS_PER_PAGE) }, (_, pi) => toPrint.slice(pi * CARDS_PER_PAGE, (pi + 1) * CARDS_PER_PAGE)).map((pageCards, pi) => (
-          <div key={pi} className="member-card-grid grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <div key={pi} className="member-card-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mb-3">
             {pageCards.map((m) => (
-              <div key={m.id} className="member-card flex items-center gap-3 rounded-xl border bg-white p-3 text-black">
-                <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <img src={logoUrl} alt="" className="member-card-logo h-6 w-auto object-contain" />
-                    <span className="text-xs font-semibold truncate">{libraryName}</span>
-                  </div>
-                  <div>
-                    <p className="member-card-name text-2xl font-bold leading-tight break-keep">{m.name}</p>
-                    <p className="member-card-group text-sm text-neutral-600">{m.dong_ho}</p>
-                    {(m.book_level || m.book_count) && (
-                      <p className="member-card-level mt-1 inline-flex flex-wrap items-baseline gap-x-1.5 rounded border border-neutral-300 px-1.5 py-0.5 text-xs leading-snug break-keep">
-                        {m.book_level && <span>📚 {m.book_level}</span>}
+              <div key={m.id} className="member-card flex flex-col gap-1 rounded-lg border bg-white p-2 text-black">
+                <div className="flex items-center gap-1 min-w-0">
+                  <img src={logoUrl} alt="" className="member-card-logo h-4 w-auto object-contain" />
+                  <span className="member-card-lib text-[10px] font-semibold truncate">{libraryName}</span>
+                </div>
+                <div className="flex flex-1 min-h-0 items-center gap-1.5">
+                  <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch">
+                    <div className="min-w-0">
+                      <p className="member-card-name text-lg font-bold leading-tight break-keep">{m.name}</p>
+                      <p className="member-card-group text-[11px] text-neutral-600 truncate">{m.dong_ho}</p>
+                    </div>
+                    {(m.book_level || m.book_count) ? (
+                      <p className="member-card-level text-[10px] leading-tight break-keep">
+                        {m.book_level && <span>{m.book_level}</span>}
+                        {m.book_level && m.book_count ? " " : ""}
                         {m.book_count && <b>{m.book_count}권</b>}
                       </p>
-                    )}
+                    ) : <span />}
                   </div>
-                  <p className="text-[10px] text-neutral-500">도서관 회원카드</p>
-                </div>
-                <div className="flex flex-col items-center shrink-0">
-                  <QrCodeSvg value={m.phone_number} className="member-card-qr size-28" />
-                  <span className="font-mono text-[9px] text-neutral-500">{m.phone_number}</span>
+                  <QrCodeSvg value={m.phone_number} className="member-card-qr size-20 shrink-0" />
                 </div>
               </div>
             ))}

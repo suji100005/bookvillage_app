@@ -390,11 +390,12 @@ export function KioskPanel({
       {phase === "home" && (
         <>
           <div className="absolute top-5 left-6 flex items-center gap-3">
-            {logoUrl && <img src={logoUrl} alt="" className="size-12 rounded-xl object-contain bg-card ring-1 ring-border" />}
-            <div className="leading-tight">
-              <p className="font-en text-[clamp(1rem,2vw,1.2rem)] font-semibold text-primary">English Bud Library</p>
-              {libraryName && <p className="text-sm text-muted-foreground">{libraryName}</p>}
-            </div>
+            <img src={logoUrl || "/logo.png"} alt="English Bud" className="h-[clamp(2.75rem,6vw,3.75rem)] w-auto object-contain" />
+            {libraryName && (
+              <p className="border-l border-border pl-3 text-[clamp(0.95rem,1.8vw,1.1rem)] font-semibold text-muted-foreground leading-tight">
+                {libraryName}
+              </p>
+            )}
           </div>
 
           <h1 className="text-[clamp(2rem,5.5vw,3.25rem)] font-bold tracking-tight text-center">오늘은 무엇을 할까요?</h1>
