@@ -12,6 +12,8 @@ import { getPublicSettings } from "@/app/actions/settings";
 
 type Member = Awaited<ReturnType<typeof getCardMembers>>[number];
 
+const CARDS_PER_PAGE = 10;
+
 function MemberCardPrint() {
   const router = useRouter();
   const params = useSearchParams();
@@ -120,13 +122,15 @@ function MemberCardPrint() {
                 ))}
               </div>
               <p className="text-sm text-muted-foreground">
-                A4 한 장에 10장(85×50mm)씩 인쇄됩니다. 테두리선을 따라 잘라 코팅하면 오래 쓸 수 있어요.
+                A4 한 장에 10장(85×50mm)씩 인쇄됩니다. 인쇄 창에서 배율은 100%(실제 크기), 용지당 페이지는 1로 두세요. 테두리선을 따라 잘라 코팅하면 오래 쓸 수 있어요.
               </p>
             </CardContent>
           </Card>
 
-          <div className="member-card-grid grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {toPrint.map((m) => (
+          {/* A4 한 장(2열×5행=10장)씩 묶어서 인쇄 — 장마다 강제로 페이지를 나눠 카드가 잘리지 않게 */}
+          {Array.from({ length: Math.ceil(toPrint.length / CARDS_PER_PAGE) }, (_, pi) => toPrint.slice(pi * CARDS_PER_PAGE, (pi + 1) * CARDS_PER_PAGE)).map((pageCards, pi) => (
+          <div key={pi} className="member-card-grid grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+            {pageCards.map((m) => (
               <div key={m.id} className="member-card flex items-center gap-3 rounded-xl border bg-white p-3 text-black">
                 <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch">
                   <div className="flex items-center gap-1.5 min-w-0">
@@ -152,6 +156,7 @@ function MemberCardPrint() {
               </div>
             ))}
           </div>
+          ))}
         </>
       )}
     </div>

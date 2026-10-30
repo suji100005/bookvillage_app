@@ -300,14 +300,26 @@
     max-width: 100% !important;
   }
   /* 회원카드 인쇄: 85×50mm, A4 한 장에 2열×5행 = 10장 */
+  /* A4 인쇄 영역 200×277mm 안에 85×50mm 카드 2열×5행. 한 묶음 = 한 장 */
   .member-card-grid {
-    display: flex !important;
-    flex-wrap: wrap !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, 85mm) !important;
+    grid-auto-rows: 50mm !important;
     gap: 3mm !important;
-    align-content: flex-start !important;
+    justify-content: center !important;
+    align-content: start !important;
+    width: 200mm !important;
+    height: 270mm !important;
+    margin: 0 !important;
+    overflow: hidden;
+    break-after: page;
+    page-break-after: always;
+  }
+  .member-card-grid:last-of-type {
+    break-after: auto;
+    page-break-after: auto;
   }
   .member-card {
-    flex: 0 0 85mm !important;
     width: 85mm !important;
     height: 50mm !important;
     padding: 3mm !important;
