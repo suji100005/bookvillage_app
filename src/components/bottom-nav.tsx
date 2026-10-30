@@ -24,19 +24,7 @@ export function BottomNav() {
   const totalBadge = notifCount + noticeCount;
 
   return (
-    <nav className="shrink-0 border-t bg-background relative">
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes scan-pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.12); }
-        }
-        @keyframes scan-glow {
-          0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
-          50% { box-shadow: 0 0 12px 4px hsl(var(--primary) / 0.2); }
-        }
-        .scan-icon { animation: scan-pulse 2s ease-in-out infinite; }
-        .scan-btn { animation: scan-glow 2s ease-in-out infinite; }
-      `}} />
+    <nav className="shrink-0 border-t bg-card relative">
       <ul className="flex items-end">
         {/* 도서 */}
         <li className="flex-1">
@@ -62,16 +50,13 @@ export function BottomNav() {
           >
             <div
               className={cn(
-                "size-[clamp(4rem,9vw,5.5rem)] rounded-full flex items-center justify-center shadow-xl transition-all border-4 border-background",
+                "size-[clamp(4rem,9vw,5.5rem)] rounded-[1.6rem] flex items-center justify-center transition-transform border-4 border-card",
                 isRentActive
-                  ? "bg-primary text-primary-foreground scale-110 scan-btn"
-                  : "bg-primary/90 text-primary-foreground scan-btn"
+                  ? "bg-primary text-primary-foreground scale-105"
+                  : "bg-primary/90 text-primary-foreground"
               )}
             >
-              <ScanBarcode className={cn(
-                "size-[clamp(1.6rem,4vw,2.6rem)]",
-                "scan-icon"
-              )} />
+              <ScanBarcode className="size-[clamp(1.6rem,4vw,2.6rem)]" />
             </div>
             <span
               className={cn(

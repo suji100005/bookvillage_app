@@ -355,7 +355,7 @@ export default function RentPage() {
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* 헤더 */}
-      <header className="shrink-0 border-b bg-background px-[clamp(1rem,3vw,2rem)] py-[1.5vh]">
+      <header className="shrink-0 border-b bg-card px-[clamp(1rem,3vw,2rem)] py-[1.5vh]">
         <div className="flex items-center gap-[clamp(0.5rem,1.5vw,0.8rem)]">
           {publicSettings?.logo_url ? (
             <img
@@ -374,7 +374,7 @@ export default function RentPage() {
                 {publicSettings.apartment_name}
               </p>
             )}
-            <h1 className="text-[clamp(1.3rem,3.5vw,2rem)] font-bold leading-tight">대여하기</h1>
+            <h1 className="text-[clamp(1.3rem,3.5vw,2rem)] font-bold leading-tight tracking-tight">대여하기</h1>
           </div>
         </div>
       </header>
@@ -532,6 +532,8 @@ export default function RentPage() {
                 allowReturn={publicSettings?.site_type === "kindergarten"}
                 scannerEnabled={!scanning && !searchOpen && !book && !dupConfirm && checkoutStep === "idle"}
                 onSignedOut={handleKioskSignedOut}
+                libraryName={publicSettings?.apartment_name}
+                logoUrl={publicSettings?.logo_url}
               />
             ) : readerMode ? (
               /* 리더기 모드: input */

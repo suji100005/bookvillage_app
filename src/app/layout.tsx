@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono } from "next/font/google";
+import { Geist_Mono, Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import { getPublicSettings } from "@/app/actions/settings";
 import { getThemeById } from "@/lib/themes";
@@ -10,6 +10,14 @@ const pretendard = localFont({
   variable: "--font-sans",
   display: "swap",
   weight: "100 900",
+});
+
+// 영문(책 제목·숫자)용 — 잉글리시버드 브랜드 서체
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -85,7 +93,7 @@ export default async function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${pretendard.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${pretendard.variable} ${geistMono.variable} ${poppins.variable} h-full antialiased`}
       data-theme={settings.color_theme || "yellow"}
       style={styleString ? (Object.fromEntries(Object.entries(lightVars)) as React.CSSProperties) : undefined}
     >
